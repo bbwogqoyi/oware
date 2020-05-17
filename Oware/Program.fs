@@ -40,21 +40,37 @@ type BoardState = {
 
    Please don't hesitate to give me any feedback and we can implement those changes.
  *)
- let _collectSeeds selectedhouse boardState =
-    match selectedhouse, boardState.board with
-    | 1, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a, (0,b,c,d,e,f,a',b',c',d',e',f')
-    | 2, (a,b,c,d,e,f,a',b',c',d',e',f')  -> b, (a,0,c,d,e,f,a',b',c',d',e',f') 
-    | 3, (a,b,c,d,e,f,a',b',c',d',e',f')  -> c, (a,b,0,d,e,f,a',b',c',d',e',f') 
-    | 4, (a,b,c,d,e,f,a',b',c',d',e',f')  -> d, (a,b,c,0,e,f,a',b',c',d',e',f')
-    | 5, (a,b,c,d,e,f,a',b',c',d',e',f')  -> e, (a,b,c,d,0,f,a',b',c',d',e',f')
-    | 6, (a,b,c,d,e,f,a',b',c',d',e',f')  -> f, (a,b,c,d,e,0,a',b',c',d',e',f')
-    | 7, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a', (a,b,c,d,e,f,0,b',c',d',e',f')
-    | 8, (a,b,c,d,e,f,a',b',c',d',e',f')  -> b', (a,b,c,d,e,f,a',0,c',d',e',f')
-    | 9, (a,b,c,d,e,f,a',b',c',d',e',f')  -> c', (a,b,c,d,e,f,a',b',0,d',e',f')
-    | 10, (a,b,c,d,e,f,a',b',c',d',e',f')  -> d', (a,b,c,d,e,f,a',b',c',0,e',f')
-    | 11, (a,b,c,d,e,f,a',b',c',d',e',f')  -> e', (a,b,c,d,e,f,a',b',c',d',0,f')
-    | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> f', (a,b,c,d,e,f,a',b',c',d',e',0)
-    | _ -> failwith "index is out-of-bound"
+let _collectSeeds selectedhouse boardState =
+  match selectedhouse, boardState.board with
+  | 1, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a, (0,b,c,d,e,f,a',b',c',d',e',f')
+  | 2, (a,b,c,d,e,f,a',b',c',d',e',f')  -> b, (a,0,c,d,e,f,a',b',c',d',e',f') 
+  | 3, (a,b,c,d,e,f,a',b',c',d',e',f')  -> c, (a,b,0,d,e,f,a',b',c',d',e',f') 
+  | 4, (a,b,c,d,e,f,a',b',c',d',e',f')  -> d, (a,b,c,0,e,f,a',b',c',d',e',f')
+  | 5, (a,b,c,d,e,f,a',b',c',d',e',f')  -> e, (a,b,c,d,0,f,a',b',c',d',e',f')
+  | 6, (a,b,c,d,e,f,a',b',c',d',e',f')  -> f, (a,b,c,d,e,0,a',b',c',d',e',f')
+  | 7, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a', (a,b,c,d,e,f,0,b',c',d',e',f')
+  | 8, (a,b,c,d,e,f,a',b',c',d',e',f')  -> b', (a,b,c,d,e,f,a',0,c',d',e',f')
+  | 9, (a,b,c,d,e,f,a',b',c',d',e',f')  -> c', (a,b,c,d,e,f,a',b',0,d',e',f')
+  | 10, (a,b,c,d,e,f,a',b',c',d',e',f')  -> d', (a,b,c,d,e,f,a',b',c',0,e',f')
+  | 11, (a,b,c,d,e,f,a',b',c',d',e',f')  -> e', (a,b,c,d,e,f,a',b',c',d',0,f')
+  | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> f', (a,b,c,d,e,f,a',b',c',d',e',0)
+  | _ -> failwith "index is out-of-bound"
+
+let _addSeed houseIndex board =
+  match houseIndex, board with
+  | 01, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a+1,b,c,d,e,f,a',b',c',d',e',f')
+  | 02, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b+1,c,d,e,f,a',b',c',d',e',f') 
+  | 03, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c+1,d,e,f,a',b',c',d',e',f') 
+  | 04, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d+1,e,f,a',b',c',d',e',f')
+  | 05, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e+1,f,a',b',c',d',e',f')
+  | 06, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f+1,a',b',c',d',e',f')
+  | 07, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a'+1,b',c',d',e',f')
+  | 08, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b'+1,c',d',e',f')
+  | 09, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c'+1,d',e',f')
+  | 10, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c',d'+1,e',f')
+  | 11, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c',d',e'+1,f')
+  | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
+  | _ -> failwith "index is out-of-bound"
 
 let getSeeds houseNumber {BoardState.board = playingMedium} : int = 
     match houseNumber, playingMedium with
@@ -84,7 +100,10 @@ let useHouse selectedhouse boardState =
     match isSelectionCorrect with 
     | true -> (getSeeds selectedhouse boardState) > 0
     | _ -> false
-  let (houseSeeds, newBoard) = _collectSeeds selectedhouse boardState  
+  
+  let (houseSeeds, newBoard) = _collectSeeds selectedhouse boardState
+
+
   // Left this here since implementation not complete
   failwith "Not implemented"
 
