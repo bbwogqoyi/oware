@@ -6,40 +6,18 @@ type StartingPosition =
 | South
 | North
 
-type state =
-| Turn
-| SouthWon
-| NorthWon
+type State =
+| Play
+| Draw
+| Win of StartingPosition
 
 type BoardState = {
   player: StartingPosition
   board: (int*int*int*int*int*int*int*int*int*int*int*int)
   score: (int*int)
-  gamestatus: state
+  status: State
 }
 
-(* The following function is intended to retrieve information about the number
-   of seeds present within a given house, using a house number and the playing 
-   field
-   
-   I will make use of the BoardState's board label defined in line 14 as the 
-   playing field and bind the return integer value to an idenifying that will take
-   the place of the given number of seeds in that house at that particular time.
-
-   To achieve this, I will use a match expression with twelve patterns representing
-   the game's twelve houses. To keep things simple, I will then bind the return value
-   to an identifier starting from one through twelve (e.g. num1, num2, etc.).
-
-   I had an error in referencing our board via BoardState.board - intelliSense flagged
-   'board' as non static and since its not a literal, I couldn't use it in a pattern
-   match. I then assigned it to a temporary identifier called playingMedium for the use
-   in the pattern match. I then defined the return type as an integer. I am also taking
-   cue from Siyanda's interface, labeling my houses like he did. 
-
-   There aren't any tests pertaining to this function in its solitude. I hope it works.
-
-   Please don't hesitate to give me any feedback and we can implement those changes.
- *)
 let _collectSeeds selectedhouse boardState =
   match selectedhouse, boardState.board with
   | 1, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a, (0,b,c,d,e,f,a',b',c',d',e',f')
@@ -72,21 +50,25 @@ let _addSeed house boardState =
   | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
   | _ -> failwith "index is out-of-bound"
 
+(* 
+  Intended to retrieve information about the number of seeds present within a
+  given house, using a house number and the playing field
+ *)
 let getSeeds houseNumber {BoardState.board = playingMedium} : int = 
-    match houseNumber, playingMedium with
-    | 1, (num1,_,_,_,_,_,_,_,_,_,_,_) -> num1
-    | 2, (_,num2,_,_,_,_,_,_,_,_,_,_) -> num2
-    | 3, (_,_,num3,_,_,_,_,_,_,_,_,_) -> num3
-    | 4, (_,_,_,num4,_,_,_,_,_,_,_,_) -> num4
-    | 5, (_,_,_,_,num5,_,_,_,_,_,_,_) -> num5
-    | 6, (_,_,_,_,_,num6,_,_,_,_,_,_) -> num6
-    | 7, (_,_,_,_,_,_,num7,_,_,_,_,_) -> num7
-    | 8, (_,_,_,_,_,_,_,num8,_,_,_,_) -> num8
-    | 9, (_,_,_,_,_,_,_,_,num9,_,_,_) -> num9
-    | 10, (_,_,_,_,_,_,_,_,_,num10,_,_) -> num10
-    | 11, (_,_,_,_,_,_,_,_,_,_,num11,_) -> num11
-    | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
-    | _ -> failwith "Not implemented"
+  match houseNumber, playingMedium with
+  | 1, (num1,_,_,_,_,_,_,_,_,_,_,_) -> num1
+  | 2, (_,num2,_,_,_,_,_,_,_,_,_,_) -> num2
+  | 3, (_,_,num3,_,_,_,_,_,_,_,_,_) -> num3
+  | 4, (_,_,_,num4,_,_,_,_,_,_,_,_) -> num4
+  | 5, (_,_,_,_,num5,_,_,_,_,_,_,_) -> num5
+  | 6, (_,_,_,_,_,num6,_,_,_,_,_,_) -> num6
+  | 7, (_,_,_,_,_,_,num7,_,_,_,_,_) -> num7
+  | 8, (_,_,_,_,_,_,_,num8,_,_,_,_) -> num8
+  | 9, (_,_,_,_,_,_,_,_,num9,_,_,_) -> num9
+  | 10, (_,_,_,_,_,_,_,_,_,num10,_,_) -> num10
+  | 11, (_,_,_,_,_,_,_,_,_,_,num11,_) -> num11
+  | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
+  | _ -> failwith "Not implemented"
 
 let useHouse selectedhouse boardState = 
   // To validate if the house belongs to player 
@@ -103,24 +85,25 @@ let useHouse selectedhouse boardState =
   
   let (houseSeeds, newBoard) = _collectSeeds selectedhouse boardState
 
-
   // Left this here since implementation not complete
   failwith "Not implemented"
 
 let start position = 
-  {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
+  { player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); status=Play }
 
 let score boardState = boardState.score
 
-let gameState board = 
-    match South.score >= 25, North.score >= 25, (South.score = 24 && North.score = 24) with 
-    |_, _, true -> "Game ended in a draw"
-    |true, true, _ -> "Game ended in a draw"
-    |true, false, _ -> "South won"
-    |false, true, _ -> "North won"
-    |false, false, _ -> match state.Turn with 
-        |South -> "South's turn"
-        |North -> "North's turn"
+let gameState boardState = 
+  let (sPts, nPts) = boardState.score
+  match sPts >= 25, nPts >= 25, (sPts = 24 && nPts= 24) with 
+  |_, _, true -> "Game ended in a draw"
+  |true, true, _ -> "Game ended in a draw"
+  |true, false, _ -> "South won"
+  |false, true, _ -> "North won"
+  |false, false, _ -> 
+    match boardState.player with 
+    |South -> "South's turn"
+    |North -> "North's turn"
 
 let updateConsole () =
     System.Console.Clear ()
