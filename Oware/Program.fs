@@ -57,20 +57,20 @@ type BoardState = {
     | _ -> failwith "index is out-of-bound"
 
 let getSeeds houseNumber {BoardState.board = playingMedium} : int = 
- match houseNumber, playingMedium with
- | 1, (num1,_,_,_,_,_,_,_,_,_,_,_) -> num1
- | 2, (_,num2,_,_,_,_,_,_,_,_,_,_) -> num2
- | 3, (_,_,num3,_,_,_,_,_,_,_,_,_) -> num3
- | 4, (_,_,_,num4,_,_,_,_,_,_,_,_) -> num4
- | 5, (_,_,_,_,num5,_,_,_,_,_,_,_) -> num5
- | 6, (_,_,_,_,_,num6,_,_,_,_,_,_) -> num6
- | 7, (_,_,_,_,_,_,num7,_,_,_,_,_) -> num7
- | 8, (_,_,_,_,_,_,_,num8,_,_,_,_) -> num8
- | 9, (_,_,_,_,_,_,_,_,num9,_,_,_) -> num9
- | 10, (_,_,_,_,_,_,_,_,_,num10,_,_) -> num10
- | 11, (_,_,_,_,_,_,_,_,_,_,num11,_) -> num11
- | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
- | _ -> failwith "Not implemented"
+    match houseNumber, playingMedium with
+    | 1, (num1,_,_,_,_,_,_,_,_,_,_,_) -> num1
+    | 2, (_,num2,_,_,_,_,_,_,_,_,_,_) -> num2
+    | 3, (_,_,num3,_,_,_,_,_,_,_,_,_) -> num3
+    | 4, (_,_,_,num4,_,_,_,_,_,_,_,_) -> num4
+    | 5, (_,_,_,_,num5,_,_,_,_,_,_,_) -> num5
+    | 6, (_,_,_,_,_,num6,_,_,_,_,_,_) -> num6
+    | 7, (_,_,_,_,_,_,num7,_,_,_,_,_) -> num7
+    | 8, (_,_,_,_,_,_,_,num8,_,_,_,_) -> num8
+    | 9, (_,_,_,_,_,_,_,_,num9,_,_,_) -> num9
+    | 10, (_,_,_,_,_,_,_,_,_,num10,_,_) -> num10
+    | 11, (_,_,_,_,_,_,_,_,_,_,num11,_) -> num11
+    | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
+    | _ -> failwith "Not implemented"
 
 let useHouse selectedhouse boardState = 
   // To validate if the house belongs to player 
@@ -84,7 +84,7 @@ let useHouse selectedhouse boardState =
     match isSelectionCorrect with 
     | true -> (getSeeds selectedhouse boardState) > 0
     | _ -> false
-
+  let (houseSeeds, newBoard) = _collectSeeds selectedhouse boardState  
   // Left this here since implementation not complete
   failwith "Not implemented"
 
