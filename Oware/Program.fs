@@ -50,6 +50,10 @@ let _addSeed house boardState =
   | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
   | _ -> failwith "index is out-of-bound"
 
+(* 
+  Intended to retrieve information about the number of seeds present within a
+  given house, using a house number and the playing field
+ *)
 let getSeeds houseNumber {BoardState.board = playingMedium} : int = 
   match houseNumber, playingMedium with
   | 1, (num1,_,_,_,_,_,_,_,_,_,_,_) -> num1
