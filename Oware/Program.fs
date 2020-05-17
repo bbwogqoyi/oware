@@ -56,8 +56,8 @@ let _collectSeeds selectedhouse boardState =
   | 12, (a,b,c,d,e,f,a',b',c',d',e',f')  -> f', (a,b,c,d,e,f,a',b',c',d',e',0)
   | _ -> failwith "index is out-of-bound"
 
-let _addSeed houseIndex board =
-  match houseIndex, board with
+let _addSeed house boardState =
+  match house, boardState with
   | 01, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a+1,b,c,d,e,f,a',b',c',d',e',f')
   | 02, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b+1,c,d,e,f,a',b',c',d',e',f') 
   | 03, (a,b,c,d,e,f,a',b',c',d',e',f')  -> (a,b,c+1,d,e,f,a',b',c',d',e',f') 
