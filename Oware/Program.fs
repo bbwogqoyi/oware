@@ -1,19 +1,21 @@
 ﻿module Oware
 
+open System
+
 type StartingPosition =
-    | South
-    | North
+| South
+| North
 
 type state =
-|Turn
-|SouthWon
-|NorthWon
+| Turn
+| SouthWon
+| NorthWon
 
 type BoardState = {
-player: StartingPosition
-board: (int*int*int*int*int*int*int*int*int*int*int*int)
-score: (int*int)
-gamestatus: state
+  player: StartingPosition
+  board: (int*int*int*int*int*int*int*int*int*int*int*int)
+  score: (int*int)
+  gamestatus: state
 }
 
 (* The following function is intended to retrieve information about the number
@@ -57,13 +59,26 @@ let getSeeds houseNumber {BoardState.board = playingMedium} : int =
 let useHouse n board = failwith "Not implemented"
 
 let start position = 
-    match position with
-    |South -> {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
-    |North -> {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
+  {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
 
-let score board = failwith "Not implemented"
+let score boardState = boardState.score
 
 let gameState board = failwith "Not implemented"
+
+let __getUserInput game = // impure
+  let rec getConsoleInput () = 
+    let retry () = printfn "Invalid selection, try again" |> getConsoleInput
+    let input = System.Console.ReadLine()
+    match (not (String.IsNullOrWhiteSpace input)) && (String.forall System.Char.IsDigit input)  with
+    | false -> retry ()
+    | true -> 
+      let selectedHouse = int input
+      match selectedHouse>=1 && selectedHouse<=12 with
+      | false -> retry ()
+      | true -> selectedHouse
+
+  printfn "%s\n" (gameState game)
+  getConsoleInput ()
 
 [<EntryPoint>]
 let main _ =
