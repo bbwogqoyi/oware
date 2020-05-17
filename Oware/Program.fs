@@ -24,28 +24,6 @@ type BoardState = {
   gamestatus: state
 }
 
-(* The following function is intended to retrieve information about the number
-   of seeds present within a given house, using a house number and the playing 
-   field
-   
-   I will make use of the BoardState's board label defined in line 14 as the 
-   playing field and bind the return integer value to an idenifying that will take
-   the place of the given number of seeds in that house at that particular time.
-
-   To achieve this, I will use a match expression with twelve patterns representing
-   the game's twelve houses. To keep things simple, I will then bind the return value
-   to an identifier starting from one through twelve (e.g. num1, num2, etc.).
-
-   I had an error in referencing our board via BoardState.board - intelliSense flagged
-   'board' as non static and since its not a literal, I couldn't use it in a pattern
-   match. I then assigned it to a temporary identifier called playingMedium for the use
-   in the pattern match. I then defined the return type as an integer. I am also taking
-   cue from Siyanda's interface, labeling my houses like he did. 
-
-   There aren't any tests pertaining to this function in its solitude. I hope it works.
-
-   Please don't hesitate to give me any feedback and we can implement those changes.
- *)
 let _collectSeeds selectedhouse boardState =
   match selectedhouse, boardState.board with
   | 1, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a, (0,b,c,d,e,f,a',b',c',d',e',f')
@@ -96,44 +74,79 @@ let getSeeds houseNumber {BoardState.board = playingMedium} : int =
 
 //This function is defined to rotate the house numbers in a circular formation from 1 through 12
 let _getFollowingHouse (op:Movement) houseNumber =
- let value = 
-  match op with
-  | Clockwise -> houseNumber+1
-  | CounterClockwise -> houseNumber-1
+  let value = 
+    match op with
+    | Clockwise -> houseNumber+1
+    | CounterClockwise -> houseNumber-1
   match value>12, value<1 with 
   | true, _ -> 1
   | _, true -> 12
   | _,_ -> value
 
-
-let useHouse selectedhouse boardState = 
+let isValidHouseSelection selectedhouse boardState  = 
   // To validate if the house belongs to player 
-  let isSelectionCorrect = 
+  let isHouseOwnedByPlayer = 
     match boardState.player with
     | South -> selectedhouse<7
     | North -> selectedhouse>=7
 
   //  Validate if selected house is not empty
-  let isSelectionCorrect = 
-    match isSelectionCorrect with 
-    | true -> (getSeeds selectedhouse boardState) > 0
-    | _ -> false
+  let isHouseEmpty = (getSeeds selectedhouse boardState) > 0
+
+  isHouseOwnedByPlayer && isHouseEmpty
+
+let _getPlayerHouseList (player:StartingPosition) = 
+  match player with
+  | South -> List.init 6 (fun x -> x+1)
+  | North -> List.init 6 (fun x -> x+7) 
+
+let _getOpponentsHouseList (current:StartingPosition) = 
+  match current with 
+  | South -> _getPlayerHouseList North
+  | North -> _getPlayerHouseList South
+
+let _isDraw (s, n) = s=n && s=24   
+
+let _isValidMove gameState =
+  let rec checkOnOpponent count houses = 
+    match houses with
+    | [] -> count
+    | entry::rest -> 
+      let numOfSeeds = getSeeds entry gameState
+      checkOnOpponent (count+numOfSeeds) rest
+
+  let opponentHouseList = _getOpponentsHouseList gameState.player
   
-    let (houseSeeds, newBoard) = _collectSeeds selectedhouse boardState
-    let rec distr Numseeds index =     //recursive function that takes in the numOfSeed in selectedHouse and index of the house 
-        match Numseeds with 
-        |0 -> //base case 
-        | _ -> 
-        match index < 12 with 
-        |true -> houseSeeds = (houseSeeds + (12-1)%12  //wraparound function 
-                |> _addSeed houseSeeds newBoard // x is the tuple returned by _collectSeeds
-                |> distr (Numseeds - 1) (houseSeeds + 1) //recursive case
-        |false -> 
-                |> _addSeed houseSeeds newBoard 
-                |> distr (Numseeds - 1) (houseSeeds + 1) //recursive case
-    distr (getSeeds selectedhouse BoardState) selectedhouse
-  // Left this here since implementation not complete
-  failwith "Not implemented"
+  let canOpponentPlay = (checkOnOpponent 0 opponentHouseList) > 0
+  let isDraw = _isDraw gameState.score
+  canOpponentPlay || isDraw
+
+let _distributeSeeds donorHouse boardState =
+  let rec helper receivinghouse numOfSeeds board = 
+    match numOfSeeds>0, receivinghouse=donorHouse with
+    | false,_ -> ((_getFollowingHouse CounterClockwise receivinghouse), board)
+    | true, true ->
+       helper (_getFollowingHouse Clockwise receivinghouse) (numOfSeeds) board
+    | true, false -> 
+      let newBoard = _addSeed receivinghouse board
+      helper (_getFollowingHouse Clockwise receivinghouse) (numOfSeeds-1) newBoard
+
+  let (houseSeeds, newBoard) = _collectSeeds donorHouse boardState
+  helper (donorHouse+1) houseSeeds newBoard
+
+let useHouse selectedhouse boardState = 
+  let selectionValid = isValidHouseSelection selectedhouse boardState
+  match selectionValid with 
+  | false -> boardState // do nothing -- the selection is invalid
+  | _ ->
+    let (lastVistedHouse, newBoard) = _distributeSeeds selectedhouse boardState
+
+    match ( _isValidMove { boardState with board=newBoard } ) with
+    | false -> boardState
+    | true ->
+      // TODO
+      // calculate new score, update boardState, and toggle/switch player
+      boardState //temporary
 
 let start position = 
   {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
