@@ -176,5 +176,17 @@ let __getUserInput () = // impure
 
 [<EntryPoint>]
 let main _ =
-    printfn "Hello from F#!"
-    0 // return an integer exit code
+  let rec playing (game:BoardState) = 
+    updateConsole () // First we print out the board to the console
+    match game.status = State.Play with
+    | false -> game // its either someone won the game or its draw
+    | true -> 
+      let input = __getUserInput ()
+      playing (useHouse input game)
+    
+  // We start the game
+  let game:BoardState = start South
+  let finalGame  = playing game 
+
+  // prints out 'Draw' or the Winner og the game
+  printfn "%s" (gameState finalGame)
