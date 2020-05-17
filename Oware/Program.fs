@@ -15,13 +15,11 @@ type State =
 | Draw
 | Win of StartingPosition
 
-
 type BoardState = {
   player: StartingPosition
   board: (int*int*int*int*int*int*int*int*int*int*int*int)
   score: (int*int)
-
-  gamestatus: state
+  status: State
 }
 
 let _collectSeeds selectedhouse boardState =
@@ -149,11 +147,6 @@ let useHouse selectedhouse boardState =
       boardState //temporary
 
 let start position = 
-  {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
-
-let score boardState = boardState.score
-
-let start position = 
   { player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); status=Play }
 
 let score boardState = boardState.score
@@ -218,3 +211,4 @@ let main _ =
 
   // prints out 'Draw' or the Winner og the game
   printfn "%s" (gameState finalGame)
+  0
