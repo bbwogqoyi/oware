@@ -2,17 +2,17 @@
 
 open System
 
-type Player =
+type StartingPosition =
 | South
 | North
 
 type State =
 | Play
 | Draw
-| Win of Player
+| Win of StartingPosition
 
 type BoardState = {
-  player: Player
+  player: StartingPosition
   board: (int*int*int*int*int*int*int*int*int*int*int*int)
   score: (int*int)
   status: State
