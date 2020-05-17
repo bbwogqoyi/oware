@@ -56,7 +56,21 @@ let getSeeds houseNumber {BoardState.board = playingMedium} : int =
  | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
  | _ -> failwith "Not implemented"
 
-let useHouse n board = failwith "Not implemented"
+let useHouse selectedhouse boardState = 
+  // To validate if the house belongs to player 
+  let isSelectionCorrect = 
+    match boardState.player with
+    | South -> selectedhouse<7
+    | North -> selectedhouse>=7
+
+  //  Validate if selected house is not empty
+  let isSelectionCorrect = 
+    match isSelectionCorrect with 
+    | true -> (getSeeds selectedhouse boardState) > 0
+    | _ -> false
+
+  // Left this here since implementation not complete
+  failwith "Not implemented"
 
 let start position = 
   {player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); gamestatus = Turn}
