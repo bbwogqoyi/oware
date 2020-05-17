@@ -6,6 +6,9 @@ type StartingPosition =
 | South
 | North
 
+type Movement =
+| Clockwise 
+| CounterClockwise
 
 type State =
 | Play
@@ -90,6 +93,18 @@ let getSeeds houseNumber {BoardState.board = playingMedium} : int =
     | 11, (_,_,_,_,_,_,_,_,_,_,num11,_) -> num11
     | 12, (_,_,_,_,_,_,_,_,_,_,_,num12) -> num12
     | _ -> failwith "Not implemented"
+
+//This function is defined to rotate the house numbers in a circular formation from 1 through 12
+let _getFollowingHouse (op:Movement) houseNumber =
+ let value = 
+  match op with
+  | Clockwise -> houseNumber+1
+  | CounterClockwise -> houseNumber-1
+  match value>12, value<1 with 
+  | true, _ -> 1
+  | _, true -> 12
+  | _,_ -> value
+
 
 let useHouse selectedhouse boardState = 
   // To validate if the house belongs to player 
