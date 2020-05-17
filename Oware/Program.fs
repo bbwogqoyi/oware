@@ -138,7 +138,7 @@ let updateConsole () =
     ()
 //updateConsole
 
-let __getUserInput game = // impure
+let __getUserInput () = // impure
   let rec getConsoleInput () = 
     let retry () = printfn "Invalid selection, try again" |> getConsoleInput
     let input = System.Console.ReadLine()
@@ -150,7 +150,6 @@ let __getUserInput game = // impure
       | false -> retry ()
       | true -> selectedHouse
 
-  printfn "%s\n" (gameState game)
   getConsoleInput ()
 
 [<EntryPoint>]
