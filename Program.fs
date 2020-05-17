@@ -1,4 +1,4 @@
-module Oware
+﻿module Oware
 
 open System
 
@@ -6,18 +6,15 @@ type StartingPosition =
 | South
 | North
 
-
-type State =
-| Play
-| Draw
-| Win of StartingPosition
-
+type state =
+| Turn
+| SouthWon
+| NorthWon
 
 type BoardState = {
   player: StartingPosition
   board: (int*int*int*int*int*int*int*int*int*int*int*int)
   score: (int*int)
-
   gamestatus: state
 }
 
@@ -125,22 +122,15 @@ let start position =
 
 let score boardState = boardState.score
 
-let start position = 
-  { player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); status=Play }
-
-let score boardState = boardState.score
-
-let gameState boardState = 
-  let (sPts, nPts) = boardState.score
-  match sPts >= 25, nPts >= 25, (sPts = 24 && nPts= 24) with 
-  |_, _, true -> "Game ended in a draw"
-  |true, true, _ -> "Game ended in a draw"
-  |true, false, _ -> "South won"
-  |false, true, _ -> "North won"
-  |false, false, _ -> 
-    match boardState.player with 
-    |South -> "South's turn"
-    |North -> "North's turn"
+let gameState board = 
+    match South.score >= 25, North.score >= 25, (South.score = 24 && North.score = 24) with 
+    |_, _, true -> "Game ended in a draw"
+    |true, true, _ -> "Game ended in a draw"
+    |true, false, _ -> "South won"
+    |false, true, _ -> "North won"
+    |false, false, _ -> match state.Turn with 
+        |South -> "South's turn"
+        |North -> "North's turn"
 
 let updateConsole () =
     System.Console.Clear ()
@@ -158,8 +148,7 @@ let updateConsole () =
     ()
 //updateConsole
 
-
-let __getUserInput () = // impure
+let __getUserInput game = // impure
   let rec getConsoleInput () = 
     let retry () = printfn "Invalid selection, try again" |> getConsoleInput
     let input = System.Console.ReadLine()
@@ -171,7 +160,7 @@ let __getUserInput () = // impure
       | false -> retry ()
       | true -> selectedHouse
 
-
+  printfn "%s\n" (gameState game)
   getConsoleInput ()
 
 [<EntryPoint>]
