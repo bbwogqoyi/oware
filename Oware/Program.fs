@@ -220,24 +220,27 @@ let gameState boardState =
     |South -> "South's turn"
     |North -> "North's turn"
 
-let updateConsole () =
+let updateConsole boardState =
+    let a,b,c,d,e,f,a',b',c',d',e',f' = boardState.board
+    let (sPts, nPts) = boardState.score 
     System.Console.Clear ()
-    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + "South's Turn " + "\n\t\t===============================================================")
+    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + gameState boardState + "\n\t\t===============================================================")
     System.Console.WriteLine ("\t\t                            NORTH")
-    System.Console.WriteLine ("\t\t--------------------------POINTS: 0 ----------------------------")
+    System.Console.WriteLine ("\t\t--------------------------POINTS: {0}----------------------------", nPts )
     System.Console.WriteLine ("\t\t ||  ||                                                 ||  ||")
-    System.Console.WriteLine ("\t\t ||  ||  12 [4]\t11 [4]\t10 [4]\t9  [4]\t8  [4]\t7  [4]  ||  ||")
+    System.Console.WriteLine ("\t\t ||  ||  12 [{0}]\t11 [{1}]\t10 [{2}]\t9  [{3}]\t8  [{4}]\t7  [{5}]  ||  ||", f', e', d', c', b', a'  )
     System.Console.WriteLine ("\t\t=====||=================================================||=====")
-    System.Console.WriteLine ("\t\t ||  ||  1  [4]\t2  [4]\t3  [4]\t4  [4]\t5  [4]\t6  [4]  ||  ||")
+    System.Console.WriteLine ("\t\t ||  ||  1  [{0}]\t2  [{1}]\t3  [{2}]\t4  [{3}]\t5  [{4}]\t6  [{5}]  ||  ||", a, b, c, d, e, f)
     System.Console.WriteLine ("\t\t ||  ||                                                 ||  ||")
-    System.Console.WriteLine ("\t\t--------------------------POINTS: 0 ----------------------------")
+    System.Console.WriteLine ("\t\t--------------------------POINTS: {0}----------------------------", sPts)
     System.Console.WriteLine ("\t\t                           SOUTH")
-    System.Console.WriteLine ("\t\t===============================================================\n\t\t\t\t \n\t\t---------------------------------------------------------------")
+    System.Console.WriteLine ("\t\t===============================================================\n\t\t\t\t\n\t\t---------------------------------------------------------------")
     ()
 
 let __getUserInput () = // impure
   let rec getConsoleInput () = 
     let retry () = printfn "Invalid selection, try again" |> getConsoleInput
+    printf "\n\t\tPlayer enter your selection: "
     let input = System.Console.ReadLine()
     match (not (String.IsNullOrWhiteSpace input)) && (String.forall System.Char.IsDigit input)  with
     | false -> retry ()
@@ -251,7 +254,7 @@ let __getUserInput () = // impure
 [<EntryPoint>]
 let main _ =
   let rec playing (game:BoardState) = 
-    updateConsole () // First we print out the board to the console
+    updateConsole game // First we print out the board to the console
     match game.status = State.Play with
     | false -> game // its either someone won the game or its draw
     | true -> 
