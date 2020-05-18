@@ -20,10 +20,11 @@ type BoardState = {
   board: (int*int*int*int*int*int*int*int*int*int*int*int)
   score: (int*int)
   status: State
+  index: int // tracks the last visited house
 }
 
-let _collectSeeds selectedhouse boardState =
-  match selectedhouse, boardState.board with
+let _collectSeeds selectedhouse board =
+  match selectedhouse, board with
   | 1, (a,b,c,d,e,f,a',b',c',d',e',f')  -> a, (0,b,c,d,e,f,a',b',c',d',e',f')
   | 2, (a,b,c,d,e,f,a',b',c',d',e',f')  -> b, (a,0,c,d,e,f,a',b',c',d',e',f') 
   | 3, (a,b,c,d,e,f,a',b',c',d',e',f')  -> c, (a,b,0,d,e,f,a',b',c',d',e',f') 
@@ -129,8 +130,64 @@ let _distributeSeeds donorHouse boardState =
       let newBoard = _addSeed receivinghouse board
       helper (_getFollowingHouse Clockwise receivinghouse) (numOfSeeds-1) newBoard
 
-  let (houseSeeds, newBoard) = _collectSeeds donorHouse boardState
+  let (houseSeeds, newBoard) = _collectSeeds donorHouse boardState.board
   helper (donorHouse+1) houseSeeds newBoard
+
+let _isHouseOwnedByPLayer (player:StartingPosition) (houseIndex:int) =
+  match player with
+  | South -> houseIndex<7
+  | North -> houseIndex>=7
+
+let _switchPlayer gameState =
+  match gameState.player, gameState.status=Play with
+  | South, true -> { gameState with player=North }
+  | North, true -> { gameState with player=South }
+  | _ -> gameState
+
+let _updateGameState gameState =
+  let score = 
+    match gameState.player, gameState.score with
+    | South, (s, _) -> s
+    | North, (_, n) -> n
+
+  match (gameState.player, (score>=25), (_isDraw gameState.score)) with
+  | South, true, _ -> { gameState with status=Win(South) }
+  | North, true, _ -> { gameState with status=Win(North) }
+  | _, false, true -> { gameState with status=Draw }
+  | _ -> gameState
+
+let _newScore previousGameState gameState =
+  let rec helper index board score =
+    let isPlayers = (_isHouseOwnedByPLayer gameState.player index)
+    match isPlayers with
+    | true ->  { gameState with score=score; board=board}
+    | false ->
+      let numOfSeeds = getSeeds index gameState
+      match numOfSeeds with
+      | 2 | 3 ->
+        let _, updatedBoard = (_collectSeeds index board)
+        let updatedScore =
+          match gameState.player, score with
+          | South, (s, n) -> (s+numOfSeeds, n)
+          | North, (s, n) -> (s, n+numOfSeeds)
+        
+        let (newScore, newBoard) =
+          match ( _isValidMove { gameState with board=updatedBoard; score=updatedScore} ) with
+          | false -> (score, board)
+          | true -> 
+            let newScore = 
+              match gameState.player, score with
+              | South, (s, n) -> (s+numOfSeeds, n)
+              | North, (s, n) -> (s, n+numOfSeeds)
+            (newScore, updatedBoard)
+
+        helper (_getFollowingHouse CounterClockwise index) newBoard newScore
+      | _ -> { gameState with score=score; board=board }
+
+  let finalState = helper gameState.index gameState.board gameState.score 
+  match _isValidMove finalState with
+  | false -> previousGameState
+  | true -> finalState
 
 let useHouse selectedhouse boardState = 
   let selectionValid = isValidHouseSelection selectedhouse boardState
@@ -142,12 +199,12 @@ let useHouse selectedhouse boardState =
     match ( _isValidMove { boardState with board=newBoard } ) with
     | false -> boardState
     | true ->
-      // TODO
-      // calculate new score, update boardState, and toggle/switch player
-      boardState //temporary
+      _newScore boardState { boardState with board=newBoard ; index=lastVistedHouse }
+      |> _updateGameState
+      |> _switchPlayer 
 
 let start position = 
-  { player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); status=Play }
+  { player=position; score=(0,0); board=(4,4,4,4,4,4,4,4,4,4,4,4); status=Play; index=0 }
 
 let score boardState = boardState.score
 
@@ -177,8 +234,6 @@ let updateConsole () =
     System.Console.WriteLine ("\t\t                           SOUTH")
     System.Console.WriteLine ("\t\t===============================================================\n\t\t\t\t \n\t\t---------------------------------------------------------------")
     ()
-//updateConsole
-
 
 let __getUserInput () = // impure
   let rec getConsoleInput () = 
@@ -191,8 +246,6 @@ let __getUserInput () = // impure
       match selectedHouse>=1 && selectedHouse<=12 with
       | false -> retry ()
       | true -> selectedHouse
-
-
   getConsoleInput ()
 
 [<EntryPoint>]
