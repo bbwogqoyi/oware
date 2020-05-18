@@ -220,11 +220,11 @@ let gameState boardState =
     |South -> "South's turn"
     |North -> "North's turn"
 
-let updateConsole BoardState gameState =
-    let a,b,c,d,e,f,a',b',c',d',e',f' = BoardState.board
-    let (sPts, nPts) = BoardState.score 
+let updateConsole boardState =
+    let a,b,c,d,e,f,a',b',c',d',e',f' = boardState.board
+    let (sPts, nPts) = boardState.score 
     System.Console.Clear ()
-    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + gameState BoardState + "\n\t\t===============================================================")
+    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + gameState boardState + "\n\t\t===============================================================")
     System.Console.WriteLine ("\t\t                            NORTH")
     System.Console.WriteLine ("\t\t--------------------------POINTS: {0}----------------------------", nPts )
     System.Console.WriteLine ("\t\t ||  ||                                                 ||  ||")
@@ -240,6 +240,7 @@ let updateConsole BoardState gameState =
 let __getUserInput () = // impure
   let rec getConsoleInput () = 
     let retry () = printfn "Invalid selection, try again" |> getConsoleInput
+    printf "\n\t\tPlayer enter your selection: "
     let input = System.Console.ReadLine()
     match (not (String.IsNullOrWhiteSpace input)) && (String.forall System.Char.IsDigit input)  with
     | false -> retry ()
@@ -253,7 +254,7 @@ let __getUserInput () = // impure
 [<EntryPoint>]
 let main _ =
   let rec playing (game:BoardState) = 
-    updateConsole () // First we print out the board to the console
+    updateConsole game // First we print out the board to the console
     match game.status = State.Play with
     | false -> game // its either someone won the game or its draw
     | true -> 
