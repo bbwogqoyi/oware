@@ -220,19 +220,21 @@ let gameState boardState =
     |South -> "South's turn"
     |North -> "North's turn"
 
-let updateConsole () =
+let updateConsole BoardState gameState =
+    let a,b,c,d,e,f,a',b',c',d',e',f' = BoardState.board
+    let (sPts, nPts) = BoardState.score 
     System.Console.Clear ()
-    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + "South's Turn " + "\n\t\t===============================================================")
+    System.Console.WriteLine ("\n\t\t---------------------------------------------------------------\n\t\t\t\t\t " + gameState BoardState + "\n\t\t===============================================================")
     System.Console.WriteLine ("\t\t                            NORTH")
-    System.Console.WriteLine ("\t\t--------------------------POINTS: 0 ----------------------------")
+    System.Console.WriteLine ("\t\t--------------------------POINTS: {0}----------------------------", nPts )
     System.Console.WriteLine ("\t\t ||  ||                                                 ||  ||")
-    System.Console.WriteLine ("\t\t ||  ||  12 [4]\t11 [4]\t10 [4]\t9  [4]\t8  [4]\t7  [4]  ||  ||")
+    System.Console.WriteLine ("\t\t ||  ||  12 [{0}]\t11 [{1}]\t10 [{2}]\t9  [{3}]\t8  [{4}]\t7  [{5}]  ||  ||", f', e', d', c', b', a'  )
     System.Console.WriteLine ("\t\t=====||=================================================||=====")
-    System.Console.WriteLine ("\t\t ||  ||  1  [4]\t2  [4]\t3  [4]\t4  [4]\t5  [4]\t6  [4]  ||  ||")
+    System.Console.WriteLine ("\t\t ||  ||  1  [{0}]\t2  [{1}]\t3  [{2}]\t4  [{3}]\t5  [{4}]\t6  [{5}]  ||  ||", a, b, c, d, e, f)
     System.Console.WriteLine ("\t\t ||  ||                                                 ||  ||")
-    System.Console.WriteLine ("\t\t--------------------------POINTS: 0 ----------------------------")
+    System.Console.WriteLine ("\t\t--------------------------POINTS: {0}----------------------------", sPts)
     System.Console.WriteLine ("\t\t                           SOUTH")
-    System.Console.WriteLine ("\t\t===============================================================\n\t\t\t\t \n\t\t---------------------------------------------------------------")
+    System.Console.WriteLine ("\t\t===============================================================\n\t\t\t\t\n\t\t---------------------------------------------------------------")
     ()
 
 let __getUserInput () = // impure
