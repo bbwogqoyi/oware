@@ -131,7 +131,7 @@ let _distributeSeeds donorHouse boardState =
       helper (_getFollowingHouse Clockwise receivinghouse) (numOfSeeds-1) newBoard
 
   let (houseSeeds, newBoard) = _collectSeeds donorHouse boardState.board
-  helper (donorHouse+1) houseSeeds newBoard
+  helper (_getFollowingHouse Clockwise donorHouse) houseSeeds newBoard
 
 let _isHouseOwnedByPLayer (player:StartingPosition) (houseIndex:int) =
   match player with
